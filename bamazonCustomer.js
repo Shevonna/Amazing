@@ -1,6 +1,7 @@
 // Dependencies
 var express = require("express");
 var mysql = require("mysql");
+var inquirer = require('inquirer');
 
 // Create instance of express app.
 var app = express();
@@ -31,31 +32,47 @@ connection.connect(function(err) {
 function findProduct() {
     inquirer
       .prompt([
+          {
         type: 'rawlist',
         name: 'prods',
         message: "What is the product id of the item yopu wish to purchace?",
         choices: [
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
-
         ]
+    },
+    {
+        type: 'input',
+        name: 'quanity',
+        message: "How many units of the product you would like to buy?"
+          }
       ])
       .then(answers => {
-        console.log(JSON.stringify(answers, null, '  '));
+        console.log("Product: ", answers.prods);
+        console.info("Quanity: ", answers.quanity);
+        updateItems();
+        function updateItems(answers){
+            connection.query("SELECT * FROM products where item_id = answers.prod", function(err, result){
+                if (result[0].stock_quanity < parseInt(answers.quanity)){
+                    var x = stock_quanity - answers.quanity;
+                    return(x);
+                }
+                else if(result[0].stock_quanity = parseInt(answers.quanity)){
+                    return 0;
+                }
+                else{
+                    return("Insufficient Quanity!")
+                }
+                connection.end();
+            })
+        
+        };
       });
-    }
+}
 
-function buyProduct() {
-    inquirer
-      .prompt([
-        type: 'input',
-        name: 'prods',
-        message: "How many units of the product you would like to buy?"
-        ]
-      )
-      .then(answers => {
-        console.log(JSON.stringify(answers, null, '  '));
-      });
-    }
+findProduct();
+// updateItems();
+
+
 
 // Routes
 app.get("/bamazon", function(req, res) {
@@ -67,9 +84,9 @@ app.get("/bamazon", function(req, res) {
     for (var i = 0; i < result.length; i++) {
       html += "<li><p> ID: " + result[i].item_id + "</p>";
       html += "<p> Name: " + result[i].product_name + "</p>";
-      html += "<p> Coolness Points: " + result[i].department_name + "</p>";
-      html += "<p>Attitude: " + result[i].price + "</p></li>";
-      html += "<p>Attitude: " + result[i].stock_quanity + "</p></li>";
+      html += "<p> Department: " + result[i].department_name + "</p>";
+      html += "<p>Price: " + result[i].price + "</p></li>";
+      html += "<p>Quanity: " + result[i].stock_quanity + "</p></li>";
     }
 
     html += "</ul>";
