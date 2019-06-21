@@ -51,7 +51,7 @@ function buyProduct() {
         name: 'prods',
         message: "How many units of the product you would like to buy?"
         ]
-      ])
+      )
       .then(answers => {
         console.log(JSON.stringify(answers, null, '  '));
       });
