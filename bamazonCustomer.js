@@ -33,12 +33,10 @@ function findProduct() {
     inquirer
       .prompt([
           {
-        type: 'rawlist',
+        type: 'input',
         name: 'prods',
-        message: "What is the product id of the item yopu wish to purchace?",
-        choices: [
-            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
-        ]
+        message: "What is the product id of the item yopu wish to purchace?"
+       
     },
     {
         type: 'input',
@@ -51,7 +49,8 @@ function findProduct() {
         console.info("Quanity: ", answers.quanity);
         updateItems();
         function updateItems(answers){
-            connection.query("SELECT * FROM products where item_id = answers.prod", function(err, result){
+            connection.query("SELECT * FROM products where ?",{item_id: answers.prods}, function(err, result){
+                console.log(result);
                 if (result[0].stock_quanity < parseInt(answers.quanity)){
                     var x = stock_quanity - answers.quanity;
                     return(x);
